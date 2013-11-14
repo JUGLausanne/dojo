@@ -2,31 +2,38 @@ package ch.jugl.dojo.coffeemachine;
 
 public class CoffeeMachine {
 	
-	public int sous = 0;
+	public int money = 0;
+	public SalesReporting reporting = new SalesReporting();
 	
 	public void setMoney(int sous) {
-		this.sous = sous;
+		this.money = sous;
 	}
 	
-	public static enum Beverage {
-		TEA("T",40), CHOCOLATE("H",50), COFFEE("C",60);
-		String code;
-		int price;
-		private Beverage(String code, int price) {
-			this.code = code;
-			this.price = price;
-		}
-	}; 
-	
+	public String order(Beverage beverage) {
+		return order(beverage, 0);
+	}
+
 	public String order(Beverage beverage, int sugarQuantity) {
-		if(sous<beverage.price) {
-			return sendMessage("0," + (beverage.price - sous) + " missing");
+		return order(beverage, sugarQuantity, Temperature.NORMAL);
+	}
+
+	public String order(Beverage beverage, int sugarQuantity, Temperature temperature) {
+		if (money < beverage.price) {
+			return sendMessage("0," + (beverage.price - money) + " missing");
 		}
-		return beverage.code + ":"+ (sugarQuantity > 0 ? sugarQuantity +":0" : ":");
+		
+		money = 0;
+		reporting.add(beverage);
+		
+		return beverage.code + temperature.code + ":"+ (sugarQuantity > 0 ? sugarQuantity +":0" : ":");
 	}
 
 	public String sendMessage(String string) {
 		return "M:"+string;
+	}
+
+	public int getRevenue() {
+		return reporting.getRevenue();
 	}
 	
 	
